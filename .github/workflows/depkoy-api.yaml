@@ -1,0 +1,36 @@
+
+name: Deploy API to Docker Hub
+on:
+  workflow_call: # Permite ser llamado por otros repos
+    secrets:
+      DOCKER_USERNAME:
+        required: true
+      DOCKER_PASSWORD:
+        required: true
+  workflow_dispatch: # Permite ejecución manual desde GitHub UI
+jobs:
+  run-inline-script:
+    runs-on: ubuntu-latest
+    steps:
+    # 1.  Checkout del código
+    - name: Checkout
+      uses: actions/checkout@v4
+    # 2. Credenciales de Docker Hub
+    #La action docker/login-action@v2 maneja el proceso de autenticación de forma
+    #segura — las credenciales nunca se escriben en texto plano en los logs. GitHub
+    #Actions oculta automáticamente los valores de secretos en la salida del runner
+    - name: Configure Docker Hub Credentials 
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+#Build/Push comentado — diseño progresivo
+#El step de build/push está comentado, lo que representa una buena práctica:
+#primero se valida el pipeline completo (auth, checkout, estructura) y luego se
+#habilita la funcionalidad de despliegue real. Esto permite identificar y corregir errores en etapas iniciales sin afectar el proceso de despliegue.
+#====================================================
+# 3. Build y Push de la imagen (comentado — pendiente de activar)
+#- name: Build and Push Docker Image
+# run: |
+# docker build -t ${{ secrets.DOCKER_USERNAME }}/my-api:latest .
+# docker push ${{ secrets.DOCKER_USERNAME }}/my-api:latest

@@ -1,0 +1,25 @@
+name : Run Hola Mundo and LS
+on:
+  workflow_call
+jobs:
+  run-inline-script:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+    - name: Run Hola Mundo and LS
+      run: |
+        echo "Hola Mundo"
+        pwd
+        ls -lah
+        echo "Fin del script"
+        echo "===================="
+        echo "Este es un ejemplo de un script inline en GitHub Actions"
+        echo "Puedes ejecutar cualquier comando de shell aquí"
+
+#¿Qué valida este workflow?
+# Que el mecanismo workflow_call funciona entre repos
+# Que el checkout del código se ejecuta correctamente
+# Que el runner puede ejecutar comandos shell básicos
+# Que los logs de salida son visibles en GitHub Actions
+# La estructura general del directorio del repo en el runner
