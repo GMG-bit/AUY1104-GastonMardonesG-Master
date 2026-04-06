@@ -18,13 +18,25 @@ on:
         required: true
       DOCKER_PASSWORD:
         required: true
-  workflow_dispatch: # Permite ejecución manual desde GitHub UI
+  workflow_dispatch:
+    inputs:
+      image_name:
+        description: 'Nombre de la imagen Docker a construir y subir'
+        required: true
+        type: string
+      image_tag:
+        description: 'Tag de la imagen Docker (ej. latest, v1.0.0)'
+        required: true
+        default: 'latest'
+        type: string
+    # Permite ejecución manual desde GitHub UI
 jobs:
-  run-inline-script:
+  pasando-en-la-nube:
+    name: Deploy API to Docker Hub
     runs-on: ubuntu-latest
     steps:
-    # 1.  Checkout del código 
-    - name: Checkout
+    # 1.  Checkout del código
+    - name: Checkout-Descargo de código repositorio
       uses: actions/checkout@v4
     # 2. Credenciales de Docker Hub
     #La action docker/login-action@v2 maneja el proceso de autenticación de forma
@@ -35,9 +47,9 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-    - name: Build and Push
+    - name: Build and Push Docker Image
       run: | 
-        echo "Build and Push steps are currently commented out for progressive design."
+        echo "Build and Push."
         docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ inputs.image_name }}:${{ inputs.image_tag }} .
         docker tag ${{ secrets.DOCKER_USERNAME }}/my-api:${{ github.sha }} \ ${{ secrets.DOCKER_USERNAME }}/my-api:latest
         docker push ${{ secrets.DOCKER_USERNAME }}/${{ inputs.image_name }}:${{ inputs.image_tag }}
