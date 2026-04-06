@@ -49,10 +49,11 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
     - name: Build and Push Docker Image
       run: |
-        IMAGEN_COMPLETA="${{ secrets.DOCKER_USERNAME }}/${{ inputs.image_name }}:${{ inputs.image_tag }}"
+        IMAGEN_COMPLETA= "${{ secrets.DOCKER_USERNAME }}/${{ inputs.image_name }}:${{ inputs.image_tag }}"
         echo "Imagen a construir y subir: $IMAGEN_COMPLETA"
-        docker build -t "${IMAGEN_COMPLETA}:${{inputs.image_tag}}"-t "${{IMAGEN_COMPLETA}}:latest".
-        docker push --all-tags ${{ secrets.DOCKER_USERNAME }}/${{ inputs.image_name }}
+        docker build -t "${IMAGEN_COMPLETA}:${{inputs.image_tag}}"\
+        -t "${IMAGEN_COMPLETA}:latest".
+        docker push --all-tags ${IMAGEN_COMPLETA}
 #Build/Push comentado — diseño progresivo
 #El step de build/push está comentado, lo que representa una buena práctica:
 #primero se valida el pipeline completo (auth, checkout, estructura) y luego se
