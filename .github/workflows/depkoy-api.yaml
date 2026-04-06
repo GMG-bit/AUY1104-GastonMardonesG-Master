@@ -1,7 +1,17 @@
 
 name: Deploy API to Docker Hub
 on:
-  workflow_call: # Permite ser llamado por otros repos
+  workflow_call:
+    inputs:
+      image_name:
+        description: 'Nombre de la imagen Docker a construir y subir'
+        required: true
+        type: string
+      image_tag:
+        description: 'Tag de la imagen Docker (ej. latest, v1.0.0)'
+        required: true
+        type: string
+      # Permite ser llamado por otros repos
     secrets:
       DOCKER_USERNAME:
         required: true
@@ -12,7 +22,7 @@ jobs:
   run-inline-script:
     runs-on: ubuntu-latest
     steps:
-    # 1.  Checkout del código
+    # 1.  Checkout del código 
     - name: Checkout
       uses: actions/checkout@v4
     # 2. Credenciales de Docker Hub
@@ -24,6 +34,10 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Build and Push
+      run: echo "Build and Push steps are currently commented out for progressive design."
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ inputs.image_name }}:${{ inputs.image_tag }} .
+        docker push ${{ secrets.DOCKER_USERNAME }}/${{ inputs.image_name }}:${{ inputs.image_tag }}
 #Build/Push comentado — diseño progresivo
 #El step de build/push está comentado, lo que representa una buena práctica:
 #primero se valida el pipeline completo (auth, checkout, estructura) y luego se
