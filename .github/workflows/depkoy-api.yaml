@@ -51,7 +51,7 @@ jobs:
       run: | 
         echo "Build and Push."
         docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ inputs.image_name }}:${{ inputs.image_tag }} .
-        docker tag ${{ secrets.DOCKER_USERNAME }}/my-api:${{ github.sha }} \ ${{ secrets.DOCKER_USERNAME }}/my-api:latest
+        docker tag ${{ secrets.DOCKER_USERNAME }}/${{ inputs.image_name }}:${{ github.sha }} ${{ secrets.DOCKER_USERNAME }}/${{ inputs.image_name }}:${{ inputs.image_tag }}
         docker push ${{ secrets.DOCKER_USERNAME }}/${{ inputs.image_name }}:${{ inputs.image_tag }}
 #Build/Push comentado — diseño progresivo
 #El step de build/push está comentado, lo que representa una buena práctica:
