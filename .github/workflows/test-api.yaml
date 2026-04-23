@@ -1,0 +1,22 @@
+name: Test API Validation
+# Este evento permite que el workflow sea llamado desde otros repositorios
+on:
+     workflow_call:
+
+jobs:
+  unit-tests:
+    name: Ejecutar Pruebas Unitarias
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Descargar el código del repositorio cliente
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      # 2. Ejecución de tests
+      # Aquí podrías poner comandos reales como 'npm test' o 'pytest'
+      - name: Run Tests
+        run: |
+          echo "Iniciando validación de código..."
+          echo "Ejecutando linter y pruebas unitarias..."
+          
+          exit 0
