@@ -1,7 +1,7 @@
 name: Test API Validation
 # Este evento permite que el workflow sea llamado desde otros repositorios
 on:
-     workflow_call:
+  workflow_call:
 
 jobs:
   unit-tests:
@@ -12,11 +12,14 @@ jobs:
       - name: Checkout del código
         uses: actions/checkout@v4
 
-      # 2. Ejecución de tests
-      # Aquí podrías poner comandos reales como 'npm test' o 'pytest'
-      - name: Run Tests
-        run: |
-          echo "Iniciando validación de código..."
-          echo "Ejecutando linter y pruebas unitarias..."
-          
-          exit 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Jest
+        run: npm test
