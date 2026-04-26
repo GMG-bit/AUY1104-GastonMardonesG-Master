@@ -31,7 +31,19 @@ on:
         type: string
     # Permite ejecución manual desde GitHub UI
 jobs:
-  pasando-en-la-nube:
+  dependencias-and-test:
+    name: Dependencias y Test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout-Descargo de código repositorio
+      uses: actions/checkout@v4 
+    - name: Instalación de dependencias
+      run: |
+        npm install
+    - name: Ejecución de tests
+      run: |
+        npm test
+  pasando-a-la-nube:
     name: Deploy API to Docker Hub
     runs-on: ubuntu-latest
     steps:
