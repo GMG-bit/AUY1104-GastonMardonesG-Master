@@ -65,7 +65,7 @@ jobs:
         docker build -t "${IMAGEN_COMPLETA}:${{inputs.image_tag}}" -t "${IMAGEN_COMPLETA}:latest" .
         docker push --all-tags ${IMAGEN_COMPLETA}
 #Build/Push comentado — diseño progresivo
-#El step de build/push está comentado, lo que representa una buena práctica:
+#El step de build/push estába comentado, lo que representa una buena práctica:
 #primero se valida el pipeline completo (auth, checkout, estructura) y luego se
 #habilita la funcionalidad de despliegue real. Esto permite identificar y corregir errores en etapas iniciales sin afectar el proceso de despliegue.
 #====================================================
