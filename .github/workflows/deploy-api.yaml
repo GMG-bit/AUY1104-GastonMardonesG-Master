@@ -106,5 +106,18 @@ jobs:
           scp -o StrictHostKeyChecking=accept-new -r k8s "ubuntu@${{ inputs.k3s-server-public-ip }}:/tmp/k8s-deploy"
           ssh -o StrictHostKeyChecking=accept-new "ubuntu@${{ inputs.k3s-server-public-ip }}" \
             'sudo k3s kubectl apply -f /tmp/k8s-deploy/'
+      - name: Validar Despliegue y Rollback
+        run: |
+          set -euo pipefail
+          echo "Verificando el estado del rollout para deployment/${{ inputs.image-name }}..."
+          if ! ssh -o StrictHostKeyChecking=accept-new "ubuntu@${{ inputs.k3s-server-public-ip }}" \
+            "sudo k3s kubectl rollout status deployment/${{ inputs.image-name }} --timeout=3m"; then
+            echo "::warning::El rollout falló o superó el timeout de 3 minutos. Iniciando Rollback..."
+            ssh -o StrictHostKeyChecking=accept-new "ubuntu@${{ inputs.k3s-server-public-ip }}" \
+              "sudo k3s kubectl rollout undo deployment/${{ inputs.image-name }}"
+            echo "::error::El despliegue falló y se realizó el rollback al estado anterior."
+            exit 1
+          fi
+          echo "Rollout exitoso!"
       - name: Verificar pods
         run: ssh -o StrictHostKeyChecking=accept-new "ubuntu@${{ inputs.k3s-server-public-ip }}" 'sudo k3s kubectl get pods -o wide'
