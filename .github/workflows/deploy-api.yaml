@@ -98,26 +98,22 @@ jobs:
       # Manifiestos viven en el repo que invoca este workflow (ej. k8s/demo.yaml)
       - name: Checkout (manifiestos K8s)
         uses: actions/checkout@v4
-      - name: Copiar k8s/ al servidor y aplicar
+      - name: Copiar k8s/ al servidor
         run: |
           set -euo pipefail
           test -d k8s || { echo "::error::Falta carpeta k8s/ en la raíz del repo"; exit 1; }
           ssh -o StrictHostKeyChecking=accept-new "ubuntu@${{ inputs.k3s-server-public-ip }}" 'sudo rm -rf /tmp/k8s-deploy'
           scp -o StrictHostKeyChecking=accept-new -r k8s "ubuntu@${{ inputs.k3s-server-public-ip }}:/tmp/k8s-deploy"
-          ssh -o StrictHostKeyChecking=accept-new "ubuntu@${{ inputs.k3s-server-public-ip }}" \
-            'sudo k3s kubectl apply -f /tmp/k8s-deploy/'
-      - name: Validar Despliegue y Rollback
+      - name: Deploy to k3s
+        id: deploy
         run: |
-          set -euo pipefail
-          echo "Verificando el estado del rollout para deployment/${{ inputs.image-name }}..."
-          if ! ssh -o StrictHostKeyChecking=accept-new "ubuntu@${{ inputs.k3s-server-public-ip }}" \
-            "sudo k3s kubectl rollout status deployment/${{ inputs.image-name }} --timeout=3m"; then
-            echo "::warning::El rollout falló o superó el timeout de 3 minutos. Iniciando Rollback..."
-            ssh -o StrictHostKeyChecking=accept-new "ubuntu@${{ inputs.k3s-server-public-ip }}" \
-              "sudo k3s kubectl rollout undo deployment/${{ inputs.image-name }}"
-            echo "::error::El despliegue falló y se realizó el rollback al estado anterior."
-            exit 1
-          fi
-          echo "Rollout exitoso!"
+          ssh -o StrictHostKeyChecking=accept-new "ubuntu@${{ inputs.k3s-server-public-ip }}" \
+            "sudo k3s kubectl apply -f /tmp/k8s-deploy/ && sudo k3s kubectl rollout status deployment/${{ inputs.image-name }} --timeout=60s"
+      - name: Rollback automático
+        id: rollback
+        if: failure()
+        run: |
+          ssh -o StrictHostKeyChecking=accept-new "ubuntu@${{ inputs.k3s-server-public-ip }}" \
+            "sudo k3s kubectl rollout undo deployment/${{ inputs.image-name }} && sudo k3s kubectl rollout status deployment/${{ inputs.image-name }} --timeout=60s"
       - name: Verificar pods
         run: ssh -o StrictHostKeyChecking=accept-new "ubuntu@${{ inputs.k3s-server-public-ip }}" 'sudo k3s kubectl get pods -o wide'
